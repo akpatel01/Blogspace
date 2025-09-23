@@ -49,6 +49,10 @@ export const blogApi = {
     createBlog: async (blogData) => {
         try {
             const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Authentication required');
+            }
+
             const response = await fetch(`${BASE_URL}/blog/create`, {
                 method: 'POST',
                 headers: {

@@ -13,7 +13,7 @@ export const authApi = {
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (!data.success) {
                 throw new Error(data.message || 'Login failed');
             }
 
@@ -29,12 +29,16 @@ export const authApi = {
 
     signup: async (userData) => {
         try {
+            // Check if userData is FormData
+            const isFormData = userData instanceof FormData;
+
             const response = await fetch(`${BASE_URL}/user/sign-up`, {
                 method: 'POST',
-                headers: {
+                // Don't set Content-Type header for FormData, browser will set it automatically
+                headers: isFormData ? undefined : {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData),
+                body: isFormData ? userData : JSON.stringify(userData),
             });
 
             const data = await response.json();

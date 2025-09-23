@@ -133,9 +133,10 @@ const CreatePost = () => {
       let imageUrl = '';
       if (selectedImage) {
         const uploadResponse = await uploadApi.uploadImage(selectedImage);
-        imageUrl = uploadResponse.imagePath;
+        imageUrl = uploadResponse.imageUrl;
+        console.log("uploadResponse", uploadResponse);
       }
-
+      console.log("imageUrl", imageUrl);
       const blogData = {
         ...formData,
         image: imageUrl,

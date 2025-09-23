@@ -138,7 +138,7 @@ const BlogDetail = () => {
         <Author>
           <AuthorName>{blog.user?.name || 'Anonymous'}</AuthorName>
         </Author>
-        <Date>{new Date(blog.createdAt).toLocaleDateString()}</Date>
+        <Date>{new window.Date(blog.createdAt).toLocaleDateString()}</Date>
       </Meta>
       <Content>
         <p>{blog.description}</p>

@@ -1,6 +1,19 @@
 import styled from '@emotion/styled';
 import PropTypes from 'prop-types';
 
+import { Link } from 'react-router-dom';
+
+const CardLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+
+  &:hover {
+    text-decoration: none;
+  }
+`;
+
 const Card = styled.div`
   background: white;
   border-radius: 12px;
@@ -128,45 +141,52 @@ const Date = styled.span`
 `;
 
 const BlogCard = ({ blog }) => {
-    const blogDate = blog.createdAt;
-    const formatted = new window.Date(blogDate).toLocaleDateString();
 
-    return (
-        <Card>
-            <Image
-                src={blog.image || 'https://via.placeholder.com/300x200'}
-                alt={blog.title}
-            />
-            <Content>
-                <Title>{blog.title}</Title>
-                <Description>{blog.description}</Description>
-                <Meta>
-                    <Author>
-                        <AuthorImage
-                            src={blog.author?.avatar || 'https://via.placeholder.com/32x32'}
-                            alt={blog.author?.name || 'Author'}
-                        />
-                        <AuthorName>{blog.author?.name || 'Anonymous'}</AuthorName>
-                    </Author>
-                    {/* <Date>{new Date(blog?.createdAt).toLocaleDateString()}</Date> */}
-                    <Date>{formatted}</Date>
-                </Meta>
-            </Content>
-        </Card>
-    );
+  return (
+    <CardLink to={`/blog/${blog._id}`}>
+      <Card>
+        <Image
+          src={blog.image}
+          alt={blog.title}
+        />
+        <Content>
+          <Title>{blog.title}</Title>
+          <Description>{blog.description}</Description>
+          <Meta>
+            <Author>
+              <AuthorImage
+                src={blog.user?.avatar}
+                alt={blog.user?.name}
+              />
+              <AuthorName>{blog.user?.name || 'Anonymous'}</AuthorName>
+            </Author>
+            <Date title={new window.Date(blog.createdAt).toLocaleString()}>
+              {new window.Date(blog.createdAt).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </Date>
+          </Meta>
+        </Content>
+      </Card>
+    </CardLink>
+  );
 };
 
 BlogCard.propTypes = {
-    blog: PropTypes.shape({
-        title: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired,
-        image: PropTypes.string,
-        author: PropTypes.shape({
-            name: PropTypes.string,
-            avatar: PropTypes.string,
-        }),
-        createdAt: PropTypes.string,
-    }).isRequired,
+  blog: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      avatar: PropTypes.string,
+      email: PropTypes.string,
+    }),
+    createdAt: PropTypes.string,
+  }).isRequired,
 };
 
 export default BlogCard;

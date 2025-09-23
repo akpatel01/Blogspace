@@ -11,6 +11,8 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
   });
+  const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,6 +22,23 @@ const Signup = () => {
       [e.target.name]: e.target.value,
     });
     setError('');
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        setError('Image size should be less than 5MB');
+        return;
+      }
+      if (!file.type.match(/image\/(jpg|jpeg|png|gif)/)) {
+        setError('Only image files (jpg, jpeg, png, gif) are allowed');
+        return;
+      }
+      setAvatar(file);
+      setAvatarPreview(URL.createObjectURL(file));
+      setError('');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -34,11 +53,17 @@ const Signup = () => {
       return;
     }
 
-    // Remove confirmPassword before sending to API
-    const { confirmPassword, ...signupData } = formData;
+    // Create FormData for multipart/form-data
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('password', formData.password);
+    if (avatar) {
+      formDataToSend.append('avatar', avatar);
+    }
 
     try {
-      await authApi.signup(signupData);
+      await authApi.signup(formDataToSend);
       navigate('/'); // Redirect to home page after successful signup
     } catch (error) {
       setError(error.message || 'Failed to sign up. Please try again.');
@@ -95,7 +120,23 @@ const Signup = () => {
               required
             />
           </InputGroup>
-          <SignupButton type="submit">Sign Up</SignupButton>
+          <InputGroup>
+            <Label>Profile Picture</Label>
+            <AvatarInput
+              type="file"
+              name="avatar"
+              accept="image/*"
+              onChange={handleAvatarChange}
+            />
+            {avatarPreview && (
+              <AvatarPreview>
+                <img src={avatarPreview} alt="Avatar preview" />
+              </AvatarPreview>
+            )}
+          </InputGroup>
+          <SignupButton type="submit" disabled={loading}>
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </SignupButton>
         </Form>
         <LoginText>
           Already have an account? <StyledLink to="/login">Login</StyledLink>
@@ -169,6 +210,44 @@ const Input = styled.input`
     outline: none;
     border-color: #ff6b00;
     box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.1);
+  }
+`;
+
+const AvatarInput = styled.input`
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  background: white;
+
+  &::file-selector-button {
+    background: #f3f4f6;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
+`;
+
+const AvatarPreview = styled.div`
+  margin-top: 1rem;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ddd;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 `;
 
