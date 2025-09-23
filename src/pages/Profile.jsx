@@ -4,12 +4,12 @@ import BlogCard from '../components/BlogCard';
 import { blogApi } from '../services/blogApi';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { DEFAULT_AVATAR, DEFAULT_COVER } from '../utils/constants';
 
 const Container = styled.div`
   width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #f6f9fc 0%, #f1f4f8 100%);
-  padding-top: 64px;
   position: relative;
   overflow: hidden;
 
@@ -175,17 +175,19 @@ const ProfileHeader = styled.div`
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 3rem;
   position: relative;
   margin-top: -80px;
   z-index: 2;
   
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
     text-align: center;
-    gap: 1.5rem;
     padding: 0 1rem;
   }
 `;
@@ -194,6 +196,8 @@ const AvatarContainer = styled.div`
   position: relative;
   margin-top: -100px;
   z-index: 2;
+  cursor: pointer;
+  flex-shrink: 0;
   
   &::before {
     content: '';
@@ -221,8 +225,8 @@ const AvatarContainer = styled.div`
 `;
 
 const Avatar = styled.img`
-  width: 220px;
-  height: 220px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   object-fit: cover;
   border: 6px solid white;
@@ -230,15 +234,32 @@ const Avatar = styled.img`
   background-color: white;
   position: relative;
   transition: all 0.3s ease;
+  margin-bottom: 1rem;
   
   &:hover {
-    transform: scale(1.02) rotate(2deg);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+    filter: brightness(0.95);
+  }
+
+  &::after {
+    content: '✏️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
   
   @media (max-width: 768px) {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     border-width: 4px;
   }
 `;
@@ -246,16 +267,21 @@ const Avatar = styled.img`
 const ProfileInfo = styled.div`
   background: white;
   border-radius: 24px;
-  padding: 2rem;
+  padding: 2.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 1400px;
+  margin-top: 0;
+  flex: 1;
 
   @media (max-width: 768px) {
     padding: 1.5rem;
     text-align: center;
+    margin-top: 1rem;
   }
 `;
 
@@ -703,10 +729,17 @@ const Profile = () => {
         </CoverOverlay>
       </CoverImage>
       <ProfileHeader>
-        <AvatarContainer>
-          <Avatar src={user.avatar} alt={user.name} />
-        </AvatarContainer>
         <ProfileInfo>
+          <AvatarContainer>
+            <Avatar
+              src={userProfile?.avatar || user.avatar || DEFAULT_AVATAR}
+              alt={userProfile?.name || user.name}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = DEFAULT_AVATAR;
+              }}
+            />
+          </AvatarContainer>
           <div>
             <Name>{user.name}</Name>
             <Username>

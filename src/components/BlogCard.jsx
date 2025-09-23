@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import PropTypes from 'prop-types';
-
 import { Link } from 'react-router-dom';
+import { DEFAULT_AVATAR } from '../utils/constants';
 
 const CardLink = styled(Link)`
   text-decoration: none;
@@ -39,14 +39,51 @@ const Card = styled.div`
   }
 `;
 
-const Image = styled.img`
+const ImageContainer = styled.div`
   width: 100%;
   height: 180px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f6f8fa 0%, #edf2f7 100%);
 
   @media (min-width: 768px) {
     height: 200px;
+  }
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+`;
+
+const ImagePlaceholder = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f6f8fa 0%, #edf2f7 100%);
+  color: #718096;
+  padding: 1rem;
+  text-align: center;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.8;
   }
 `;
 
@@ -145,18 +182,41 @@ const BlogCard = ({ blog }) => {
   return (
     <CardLink to={`/blog/${blog._id}`}>
       <Card>
-        <Image
-          src={blog.image}
-          alt={blog.title}
-        />
+        <ImageContainer>
+          {blog.image ? (
+            <Image
+              src={blog.image}
+              alt={blog.title}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.querySelector('.placeholder').style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <ImagePlaceholder className="placeholder" style={{ display: blog.image ? 'none' : 'flex' }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6a2 2 0 100-4 2 2 0 000 4z"
+              />
+            </svg>
+            <p>{blog.title.slice(0, 2)}</p>
+          </ImagePlaceholder>
+        </ImageContainer>
         <Content>
           <Title>{blog.title}</Title>
           <Description>{blog.description}</Description>
           <Meta>
             <Author>
               <AuthorImage
-                src={blog.user?.avatar}
-                alt={blog.user?.name}
+                src={blog.user?.avatar || DEFAULT_AVATAR}
+                alt={blog.user?.name || 'Author'}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = DEFAULT_AVATAR;
+                }}
               />
               <AuthorName>{blog.user?.name || 'Anonymous'}</AuthorName>
             </Author>

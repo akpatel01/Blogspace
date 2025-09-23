@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
+import { DEFAULT_AVATAR } from '../utils/constants';
 
 const Nav = styled.nav`
   background: white;
@@ -98,6 +99,20 @@ const DropdownItem = styled(Link)`
 }
 `;
 
+const Avatar = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
 const LoginButton = styled(Link)`
   background: linear-gradient(135deg, #ff8a00 0%, #ff5f6d 100%);
   color: #666;
@@ -160,7 +175,14 @@ const Navbar = () => {
           {user ? (
             <>
               <ProfileSection onClick={() => setIsDropdownOpen(!isDropdownOpen)} ref={dropdownRef}>
-                <Avatar src={user.avatar} />
+                <Avatar
+                  src={user?.avatar || DEFAULT_AVATAR}
+                  alt={user?.name || 'User'}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = DEFAULT_AVATAR;
+                  }}
+                />
                 <DropdownMenu isOpen={isDropdownOpen}>
                   <DropdownItem to="/profile">
                     <span>👤</span> Profile
