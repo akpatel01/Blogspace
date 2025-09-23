@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f5f7fa;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+}
