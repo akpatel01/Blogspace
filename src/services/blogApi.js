@@ -49,7 +49,7 @@ export const blogApi = {
     createBlog: async (blogData) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${BASE_URL}/blog/add-blog`, {
+            const response = await fetch(`${BASE_URL}/blog/create`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

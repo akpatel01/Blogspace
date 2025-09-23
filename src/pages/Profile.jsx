@@ -370,7 +370,7 @@ const Profile = () => {
       <BlogsSection>
         <SectionTitle>My Posts</SectionTitle>
         <BlogGrid>
-          {userBlogs.map(blog => (
+          {blogs.map(blog => (
             <BlogCard key={blog._id} blog={blog} />
           ))}
         </BlogGrid>
