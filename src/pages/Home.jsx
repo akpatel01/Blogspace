@@ -74,22 +74,25 @@ const Subtitle = styled.p`
 const BlogGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
   animation: ${fadeIn} 0.6s ease-out;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 400px;
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    max-width: 800px;
   }
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    max-width: 1200px;
   }
 
   @media (min-width: 1400px) {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
   }
 `;
 
@@ -103,7 +106,11 @@ const Home = () => {
     const fetchBlogs = async () => {
       try {
         const data = await blogApi.getAllBlogs();
-        setBlogs(data.blogs || []);
+        if (data?.success) {
+          setBlogs(data?.data?.blogs || []);
+        } else {
+          setError('Failed to fetch blogs');
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -116,33 +123,39 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      <Header>
-        <Title>Explore Stories</Title>
-        <Subtitle>Discover amazing stories shared by our community</Subtitle>
-      </Header>
-      <BlogGrid>
-        {loading ? (
-          Array.from({ length: 6 }).map((_, index) => (
-            <BlogCardSkeleton key={`skeleton-${index}`} />
-          ))
-        ) : error ? (
-          <p style={{ color: '#e74c3c', textAlign: 'center', gridColumn: '1 / -1' }}>
-            {error}
-          </p>
-        ) : blogs.length === 0 ? (
-          <p style={{ textAlign: 'center', gridColumn: '1 / -1' }}>No blogs found</p>
-        ) : (
-          blogs.map((blog) => (
-            <Link
-              to={`/blog/${blog._id}`}
-              key={blog._id}
-              style={{ textDecoration: 'none' }}
-            >
-              <BlogCard blog={blog} />
-            </Link>
-          ))
-        )}
-      </BlogGrid>
+      <ContentWrapper>
+        <Header>
+          <Title>Explore Stories</Title>
+          <Subtitle>Discover amazing stories shared by our community</Subtitle>
+        </Header>
+        <BlogGrid>
+          {loading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <BlogCardSkeleton key={`skeleton-${index}`} />
+            ))
+          ) : error ? (
+            <p style={{ color: '#e74c3c', textAlign: 'center', gridColumn: '1 / -1', fontSize: '1.1rem' }}>
+              {error}
+            </p>
+          ) : blogs.length === 0 ? (
+            <p style={{
+              textAlign: 'center',
+              gridColumn: '1 / -1',
+              fontSize: '1.1rem',
+              color: '#666',
+              padding: '2rem'
+            }}>
+              No blogs found. Be the first to create one!
+            </p>
+          ) : (
+            blogs.map((blog) => (
+              <div key={blog._id} style={{ height: '100%' }}>
+                <BlogCard blog={blog} />
+              </div>
+            ))
+          )}
+        </BlogGrid>
+      </ContentWrapper>
     </HomeContainer>
   );
 };

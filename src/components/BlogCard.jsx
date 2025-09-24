@@ -127,14 +127,12 @@ const Description = styled.p`
 `;
 
 const Meta = styled.div`
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-  flex-wrap: wrap;
-  gap: 0.5rem;
 `;
 
 const Author = styled.div`
@@ -177,7 +175,77 @@ const Date = styled.span`
   }
 `;
 
+const TagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+`;
+
+const Tag = styled.span`
+  background: #f0f2f5;
+  color: #4a5568;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+  }
+`;
+
+const Stats = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+`;
+
+const StatItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #718096;
+  font-size: 0.85rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+const ReadTime = styled(StatItem)`
+  &:before {
+    content: '•';
+    margin-right: 0.35rem;
+  }
+`;
+
+const Category = styled.span`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+`;
+
 const BlogCard = ({ blog }) => {
+  // Format date
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new window.Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Get main category from tags
+  const mainCategory = blog.tags?.[0]?.charAt(0).toUpperCase() + blog.tags?.[0]?.slice(1) || 'General';
 
   return (
     <CardLink to={`/blog/${blog._id}`}>
@@ -193,6 +261,7 @@ const BlogCard = ({ blog }) => {
               }}
             />
           ) : null}
+          <Category>{mainCategory}</Category>
           <ImagePlaceholder className="placeholder" style={{ display: blog.image ? 'none' : 'flex' }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path
@@ -208,6 +277,20 @@ const BlogCard = ({ blog }) => {
         <Content>
           <Title>{blog.title}</Title>
           <Description>{blog.description}</Description>
+
+          {blog.tags && blog.tags.length > 0 && (
+            <TagsContainer>
+              {blog.tags.slice(0, 3).map((tag, index) => (
+                <Tag key={index}>
+                  {tag}
+                </Tag>
+              ))}
+              {blog.tags.length > 3 && (
+                <Tag>+{blog.tags.length - 3}</Tag>
+              )}
+            </TagsContainer>
+          )}
+
           <Meta>
             <Author>
               <AuthorImage
@@ -220,13 +303,11 @@ const BlogCard = ({ blog }) => {
               />
               <AuthorName>{blog.user?.name || 'Anonymous'}</AuthorName>
             </Author>
-            <Date title={new window.Date(blog.createdAt).toLocaleString()}>
-              {new window.Date(blog.createdAt).toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              })}
-            </Date>
+            <div>
+              <Date title={blog.createdAt}>
+                {formatDate(blog.createdAt)}
+              </Date>
+            </div>
           </Meta>
         </Content>
       </Card>
@@ -240,6 +321,9 @@ BlogCard.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    likes: PropTypes.number,
+    readTime: PropTypes.number,
     user: PropTypes.shape({
       name: PropTypes.string,
       avatar: PropTypes.string,
