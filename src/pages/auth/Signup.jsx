@@ -82,7 +82,7 @@ const Signup = () => {
   }; return (
     <Container>
       <FormWrapper>
-        <Logo>BlogSphere</Logo>
+        <Logo>BlogSpace</Logo>
         <Title>Create an Account</Title>
         <Form onSubmit={handleSubmit}>
           <InputGroup>

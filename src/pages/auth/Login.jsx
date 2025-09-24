@@ -44,7 +44,7 @@ const Login = () => {
   }; return (
     <Container>
       <FormWrapper>
-        <Logo>BlogSphere</Logo>
+        <Logo>BlogSpace</Logo>
         <Title>Welcome Back!</Title>
         <Form onSubmit={handleSubmit}>
           <InputGroup>
