@@ -8,28 +8,59 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for existing user session
-        const storedUser = authApi.getCurrentUser();
-        if (storedUser) {
-            setUser(storedUser);
-        }
-        setLoading(false);
+        const checkAuth = async () => {
+            try {
+                // Check for existing user session
+                const storedUser = localStorage.getItem('user');
+                if (storedUser) {
+                    const parsedUser = JSON.parse(storedUser);
+                    // Verify the token is still valid
+                    const currentUser = await authApi.getCurrentUser();
+                    if (currentUser) {
+                        setUser(currentUser);
+                    } else {
+                        // If token is invalid, clear the stored user
+                        localStorage.removeItem('user');
+                        setUser(null);
+                    }
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('user');
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuth();
     }, []);
 
     const login = async (credentials) => {
-        const response = await authApi.login(credentials);
-        setUser(response.user);
-        return response;
+        try {
+            const response = await authApi.login(credentials);
+            setUser(response.user);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            return response;
+        } catch (error) {
+            throw error;
+        }
     };
 
     const signup = async (userData) => {
-        const response = await authApi.signup(userData);
-        setUser(response.user);
-        return response;
+        try {
+            const response = await authApi.signup(userData);
+            setUser(response.user);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            return response;
+        } catch (error) {
+            throw error;
+        }
     };
 
     const logout = () => {
         authApi.logout();
+        localStorage.removeItem('user');
         setUser(null);
     };
 

@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../../services/authApi';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleChange = (e) => {
     setFormData({
@@ -26,11 +35,10 @@ const Login = () => {
     setError('');
 
     try {
-      await authApi.login(formData);
-      navigate('/'); // Redirect to home page after successful login
+      await login(formData);
+      // Navigation will be handled by the useEffect hook when isAuthenticated changes
     } catch (error) {
       setError(error.message || 'Failed to login. Please try again.');
-    } finally {
       setLoading(false);
     }
   }; return (

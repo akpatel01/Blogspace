@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../../services/authApi';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signup, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +17,13 @@ const Signup = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleChange = (e) => {
     setFormData({
@@ -63,11 +72,11 @@ const Signup = () => {
     }
 
     try {
-      await authApi.signup(formDataToSend);
-      navigate('/'); // Redirect to home page after successful signup
+      // Use the signup function from AuthContext
+      await signup(formDataToSend);
+      // Navigation will be handled by useEffect when isAuthenticated changes
     } catch (error) {
       setError(error.message || 'Failed to sign up. Please try again.');
-    } finally {
       setLoading(false);
     }
   }; return (

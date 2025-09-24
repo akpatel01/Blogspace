@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import BlogDetail from './pages/BlogDetail'
 import CreatePost from './pages/CreatePost'
 import Profile from './pages/Profile'
+import Explore from './pages/Explore'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -35,6 +36,7 @@ function AppContent() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route
             path="/create"
