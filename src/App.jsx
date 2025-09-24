@@ -9,6 +9,7 @@ import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import './App.css'
+import ComingSoon from './pages/Setting'
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -37,6 +38,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/settings" element={<ComingSoon />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route
             path="/create"

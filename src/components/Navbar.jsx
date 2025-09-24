@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
-import styled from '@emotion/styled';
-import { useAuth } from '../contexts/AuthContext';
-import { useState, useRef, useEffect } from 'react';
-import { DEFAULT_AVATAR } from '../utils/constants';
+import { Link } from "react-router-dom";
+import styled from "@emotion/styled";
+import { useAuth } from "../contexts/AuthContext";
+import { useState, useRef, useEffect } from "react";
+import { DEFAULT_AVATAR } from "../utils/constants";
 
+// Navbar wrapper
 const Nav = styled.nav`
   background: white;
   padding: 1rem;
@@ -14,6 +15,7 @@ const Nav = styled.nav`
   width: 100%;
 `;
 
+// Container
 const NavContainer = styled.div`
   max-width: 1400px;
   margin: 0 auto;
@@ -23,6 +25,7 @@ const NavContainer = styled.div`
   padding: 0 1rem;
 `;
 
+// Logo
 const Logo = styled(Link)`
   font-size: 1.5rem;
   font-weight: bold;
@@ -37,12 +40,34 @@ const Logo = styled(Link)`
   }
 `;
 
+// Desktop links
 const NavLinks = styled.div`
   display: flex;
   gap: 2rem;
   align-items: center;
+
+  @media (max-width: 768px) {
+    display: none; /* hide on small screens */
+  }
 `;
 
+// Mobile menu
+const MobileMenu = styled.div`
+  position: absolute;
+  top: 70px;
+  right: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 200px;
+  transition: all 0.3s ease;
+`;
+
+// Nav link
 const NavLink = styled(Link)`
   color: #666;
   text-decoration: none;
@@ -50,8 +75,14 @@ const NavLink = styled(Link)`
   padding: 0.5rem 1rem;
   border-radius: 8px;
   transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #333;
+  }
 `;
 
+// Profile section
 const ProfileSection = styled.div`
   position: relative;
   display: flex;
@@ -60,6 +91,7 @@ const ProfileSection = styled.div`
   cursor: pointer;
 `;
 
+// Dropdown
 const DropdownMenu = styled.div`
   position: absolute;
   top: 120%;
@@ -69,9 +101,9 @@ const DropdownMenu = styled.div`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 0.5rem;
   min-width: 200px;
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-  transform: translateY(${props => props.isOpen ? '0' : '-10px'});
+  opacity: ${(props) => (props.isOpen ? 1 : 0)};
+  visibility: ${(props) => (props.isOpen ? "visible" : "hidden")};
+  transform: translateY(${(props) => (props.isOpen ? "0" : "-10px")});
   transition: all 0.3s ease;
 `;
 
@@ -86,19 +118,35 @@ const DropdownItem = styled(Link)`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f5f5f5;
+    background-color: #f5f5f5;
   }
 
   &.logout {
     color: #ff5f6d;
   }
-
-  &:hover {
-  color: #333;
-  background - color: #f5f5f5;
-}
 `;
 
+const LogoutButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  color: #ff5f6d;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+// Avatar
 const Avatar = styled.img`
   width: 36px;
   height: 36px;
@@ -113,9 +161,10 @@ const Avatar = styled.img`
   }
 `;
 
+// Login button
 const LoginButton = styled(Link)`
   background: linear-gradient(135deg, #ff8a00 0%, #ff5f6d 100%);
-  color: #666;
+  color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 50px;
   text-decoration: none;
@@ -133,15 +182,32 @@ const LoginButton = styled(Link)`
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(255, 95, 109, 0.2);
   }
+`;
 
-  &.active {
-    color: #333;
+// Hamburger icon
+const Hamburger = styled.div`
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  span {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
   }
 `;
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -150,11 +216,8 @@ const Navbar = () => {
         setIsDropdownOpen(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -168,43 +231,85 @@ const Navbar = () => {
         <Logo to="/">
           <span>📝</span> BlogSpace
         </Logo>
+
+        {/* Desktop links */}
         <NavLinks>
           <NavLink to="/">Home</NavLink>
           <NavLink to="/explore">Explore</NavLink>
-
           {user ? (
-            <>
-              <ProfileSection onClick={() => setIsDropdownOpen(!isDropdownOpen)} ref={dropdownRef}>
-                <Avatar
-                  src={user?.avatar || DEFAULT_AVATAR}
-                  alt={user?.name || 'User'}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = DEFAULT_AVATAR;
-                  }}
-                />
-                <DropdownMenu isOpen={isDropdownOpen}>
-                  <DropdownItem to="/profile">
-                    <span>👤</span> Profile
-                  </DropdownItem>
-                  <DropdownItem to="/settings">
-                    <span>⚙️</span> Settings
-                  </DropdownItem>
-                  <DropdownItem as="button" onClick={handleLogout} className="logout">
-                    <span>🚪</span> Logout
-                  </DropdownItem>
-                </DropdownMenu>
-              </ProfileSection>
-            </>
+            <ProfileSection
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              ref={dropdownRef}
+            >
+              <Avatar
+                src={user?.avatar || DEFAULT_AVATAR}
+                alt={user?.name || "User"}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = DEFAULT_AVATAR;
+                }}
+              />
+              <DropdownMenu isOpen={isDropdownOpen}>
+                <DropdownItem to="/profile">
+                  <span>👤</span> Profile
+                </DropdownItem>
+                <DropdownItem to="/settings">
+                  <span>⚙️</span> Settings
+                </DropdownItem>
+                <LogoutButton onClick={handleLogout}>
+                  <span>🚪</span> Logout
+                </LogoutButton>
+              </DropdownMenu>
+            </ProfileSection>
           ) : (
-            <>
-              <LoginButton to="/login">
-                Sign In
-              </LoginButton>
-            </>
+            <LoginButton to="/login">Sign In</LoginButton>
           )}
         </NavLinks>
+
+        {/* Mobile Hamburger */}
+        <Hamburger onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <span />
+          <span />
+          <span />
+        </Hamburger>
       </NavContainer>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <MobileMenu>
+          <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
+            Home
+          </NavLink>
+          <NavLink to="/explore" onClick={() => setIsMobileMenuOpen(false)}>
+            Explore
+          </NavLink>
+          {user ? (
+            <>
+              <NavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                👤 Profile
+              </NavLink>
+              <NavLink
+                to="/settings"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                ⚙️ Settings
+              </NavLink>
+              <LogoutButton
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                🚪 Logout
+              </LogoutButton>
+            </>
+          ) : (
+            <LoginButton to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+              Sign In
+            </LoginButton>
+          )}
+        </MobileMenu>
+      )}
     </Nav>
   );
 };
